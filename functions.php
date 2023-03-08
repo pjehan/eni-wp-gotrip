@@ -1,5 +1,6 @@
 <?php
 
+use Carbon_Fields\Block;
 use Carbon_Fields\Carbon_Fields;
 use Carbon_Fields\Container;
 use Carbon_Fields\Field;
@@ -98,6 +99,44 @@ function gotrip_trip_register_field() {
             Field::make_media_gallery('gallery', 'Images')
                 ->set_type('image')
         ]);
+
+    // Block Gutenberg pour afficher la liste des voyages
+    Block::make('Liste voyages')
+        ->set_category('gotrip', 'Go Trip', 'airplane')
+        ->set_icon('list-view')
+        ->add_fields([
+            Field::make_association('tax_location', 'Emplacement')
+                ->set_types([
+                    [ 'type' => 'term', 'taxonomy' => 'location' ]
+                ])
+        ])
+        ->set_render_callback(function($fields, $attributes, $inner_blocks) {
+            $locations = $fields['tax_location'];
+            $locations_ids = array_map(fn($location) => $location['id'], $locations);
+            /*
+            $locations_ids = [];
+            foreach ($locations as $location) {
+                $locations_ids[] = $location['id'];
+            }
+            */
+            $trips = new WP_Query([
+                'post_type' => 'trip',
+                'tax_query' => [
+                    [ 'taxonomy' => 'location', 'field' => 'term_id', 'terms' => $locations_ids ]
+                ]
+            ]);
+            ?>
+            <ul>
+                <?php while($trips->have_posts()) : ?>
+                    <?php $trips->the_post(); ?>
+                    <li>
+                        <?php the_title(); ?>
+                    </li>
+                <?php endwhile; ?>
+            </ul>
+            <?php
+            wp_reset_postdata();
+        });
 }
 
 add_action('after_setup_theme', 'gotrip_after_setup_theme');
