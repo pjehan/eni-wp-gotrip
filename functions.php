@@ -100,6 +100,13 @@ function gotrip_trip_register_field() {
                 ->set_type('image')
         ]);
 
+    // Ajouter une image (drapeau) sur les emplacements
+    Container::make_term_meta('location_custom_fields', 'Données de l\'emplacement')
+        ->where('term_taxonomy', '=', 'location')
+        ->add_fields([
+                Field::make_image('flag', 'Drapeau')
+        ]);
+
     // Block Gutenberg pour afficher la liste des voyages
     Block::make('Liste voyages')
         ->set_category('gotrip', 'Go Trip', 'airplane')
@@ -136,6 +143,33 @@ function gotrip_trip_register_field() {
             </ul>
             <?php
             wp_reset_postdata();
+        });
+
+    // Block Gutenberg pour afficher la liste des pays
+    Block::make('Liste pays')
+        ->set_category('gotrip')
+        ->set_icon('admin-site')
+        ->add_fields([
+            Field::make_checkbox('display_flag', 'Afficher drapeau')
+        ])
+        ->set_render_callback(function($fields, $attributes, $inner_blocks) {
+            $display_flag = $fields['display_flag'];
+            $countries = get_terms([
+                'taxonomy' => 'location',
+                'parent' => 0
+            ]);
+            ?>
+            <ul>
+                <?php foreach($countries as $country) : ?>
+                    <li>
+                        <?php if ($display_flag) : ?>
+                            <?php echo wp_get_attachment_image(carbon_get_term_meta($country->term_id, 'flag'), 'thumbnail') ?>
+                        <?php endif; ?>
+                        <?= $country->name; ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+            <?php
         });
 }
 
