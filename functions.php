@@ -48,7 +48,27 @@ function gotrip_register_trip_cpt() {
         ],
         'public' => true,
         'has_archive' => true,
+        'menu_icon' => 'dashicons-airplane',
+        //'show_in_rest' => true,
         'rewrite' => ['slug' => 'voyages'],
         'supports' => ['title', 'editor', 'thumbnail', 'excerpt']
     ]);
+
+    register_taxonomy('location', ['trip'], [
+        'label' => 'Emplacements',
+        'rewrite' => ['slug' => 'emplacement'],
+        'hierarchical' => true
+    ]);
+
+    register_taxonomy('language', ['trip'], [
+        'label' => 'Langues',
+        'rewrite' => ['slug' => 'langue'],
+        'hierarchical' => false
+    ]);
+}
+
+add_action('after_setup_theme', 'gotrip_after_setup_theme');
+function gotrip_after_setup_theme() {
+    gotrip_register_trip_cpt();
+    flush_rewrite_rules();
 }

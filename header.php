@@ -18,3 +18,5 @@
 
     <?php wp_nav_menu([ 'theme_location' => 'primary', 'container' => 'nav', 'container_class' => 'menu-primary' ]) ?>
 </header>
+
+<main class="container">
