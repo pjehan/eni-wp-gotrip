@@ -1,5 +1,8 @@
 <?php get_header(); ?>
 
+    <?php $term = get_queried_object();  ?>
+    <h1>Liste des voyages : <?php echo $term->name; ?></h1>
+
     <section class="grid">
         <?php if (have_posts()) : ?>
             <?php while (have_posts()) : ?>

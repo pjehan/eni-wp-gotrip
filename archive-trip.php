@@ -1,5 +1,7 @@
 <?php get_header(); ?>
 
+<h1>Liste des voyages</h1>
+
 <section class="grid">
     <?php if (have_posts()) : ?>
         <?php while (have_posts()) : ?>
