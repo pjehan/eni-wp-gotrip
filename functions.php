@@ -1,4 +1,16 @@
 <?php
+
+use Carbon_Fields\Carbon_Fields;
+use Carbon_Fields\Container;
+use Carbon_Fields\Field;
+
+add_action('after_setup_theme', 'crb_load');
+function crb_load() {
+    require_once('vendor/autoload.php');
+    Carbon_Fields::boot();
+}
+
+
 add_action('wp_enqueue_scripts', 'gotrip_enqueue_styles');
 function gotrip_enqueue_styles() {
     wp_enqueue_style('gotrip-style', get_template_directory_uri() . '/style.css', [], wp_get_theme()->get('Version'));
@@ -65,6 +77,27 @@ function gotrip_register_trip_cpt() {
         'rewrite' => ['slug' => 'langue'],
         'hierarchical' => false
     ]);
+}
+
+add_action('carbon_fields_register_fields', 'gotrip_trip_register_field');
+function gotrip_trip_register_field() {
+    Container::make_post_meta('trip_container', 'Données du voyage')
+        ->where('post_type', '=', 'trip')
+        ->add_fields([
+            Field::make_text('duration', 'Durée')
+                ->set_attribute('type', 'number')
+                ->set_help_text('Durée en heures'),
+            Field::make_text('group_size', 'Taille du groupe')
+                ->set_attribute('type', 'number'),
+            Field::make_complex('highlights', 'Points intéressants')
+                ->setup_labels([ 'singular_name' => 'Point intéressant', 'plural_name' => 'Points intéressants' ])
+                ->set_layout('tabbed-horizontal')
+                ->add_fields([
+                    Field::make_text('highlight_text', 'Texte')
+                ]),
+            Field::make_media_gallery('gallery', 'Images')
+                ->set_type('image')
+        ]);
 }
 
 add_action('after_setup_theme', 'gotrip_after_setup_theme');
